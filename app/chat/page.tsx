@@ -2,30 +2,38 @@
 
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { Sidebar } from "@/components/spiral/sidebar";
 import { ChatInterface } from "@/components/spiral/chat-interface";
-
-const TEMP_USER_ID = "user_demo";
 
 export default function ChatPage() {
   const [activeSessionId, setActiveSessionId] = useState<Id<"sessions"> | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  const sessions = useQuery(api.sessions.list, { userId: TEMP_USER_ID });
+  const { signOut } = useAuthActions();
+  const user = useQuery(api.users.viewer);
+  const userId = user?._id;
+
+  const sessions = useQuery(api.sessions.list, userId ? { userId: userId } : "skip");
   const createSession = useMutation(api.sessions.create);
 
   const handleNewSession = async () => {
+    if (!userId) return;
     const sessionId = await createSession({
-      userId: TEMP_USER_ID,
+      userId: userId,
       title: "New Session",
       contentType: "blog",
     });
     setActiveSessionId(sessionId);
     setIsMobileMenuOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   const handleSelectSession = (sessionId: Id<"sessions">) => {
@@ -81,11 +89,21 @@ export default function ChatPage() {
       </div>
 
       {/* Main Content Area */}
-      {activeSessionId ? (
-        <ChatInterface sessionId={activeSessionId} userId={TEMP_USER_ID} />
+      {activeSessionId && userId ? (
+        <ChatInterface sessionId={activeSessionId} userId={userId} />
       ) : (
         <EmptyState onNewSession={handleNewSession} />
       )}
+
+      {/* Sign Out Button */}
+      <button
+        onClick={handleSignOut}
+        className="fixed bottom-4 right-4 z-50 flex items-center gap-2 px-3 py-2 bg-[#262626] hover:bg-[#333] border border-[#333] rounded-lg text-gray-400 hover:text-gray-200 text-sm transition-colors"
+        title="Sign out"
+      >
+        <LogOut size={16} />
+        <span className="hidden sm:inline">Sign out</span>
+      </button>
     </div>
   );
 }
@@ -111,12 +129,10 @@ function EmptyState({ onNewSession }: { onNewSession: () => void }) {
               <path d="M21 12a9 9 0 1 1-6.219-8.56" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-100 mb-4">
-            Spiral
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-100 mb-4">Spiral</h1>
           <p className="text-gray-400 mb-8">
-            Your AI writing partner. Start a conversation and I&apos;ll help you craft
-            tweets, blog posts, emails, and essays.
+            Your AI writing partner. Start a conversation and I&apos;ll help you craft tweets, blog
+            posts, emails, and essays.
           </p>
           <button
             onClick={onNewSession}
