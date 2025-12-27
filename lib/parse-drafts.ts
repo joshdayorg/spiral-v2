@@ -8,8 +8,6 @@ export interface ParsedDraft {
 export function parseDrafts(text: string): ParsedDraft[] {
   const drafts: ParsedDraft[] = [];
   
-  // Match patterns like "**Draft 1: Title**" or "Draft 1: Title"
-  const draftPattern = /\*?\*?Draft\s*(\d+):\s*([^*\n]+)\*?\*?\s*(?:\n|$)/gi;
   const strategyPattern = /Strategy:\s*([^\n]+)/i;
   const wordCountPattern = /Word\s*count:\s*(\d+)/i;
   
@@ -23,7 +21,6 @@ export function parseDrafts(text: string): ParsedDraft[] {
     const headerMatch = part.match(/\*?\*?Draft\s*(\d+):\s*([^*\n]+)\*?\*?/i);
     if (!headerMatch) continue;
     
-    const draftNumber = parseInt(headerMatch[1]);
     const title = headerMatch[2].trim().replace(/\*+/g, '');
     
     // Extract strategy

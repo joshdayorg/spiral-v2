@@ -85,12 +85,37 @@ npx convex dev          # Start Convex (creates .env.local)
 pnpm dev                # Start Next.js
 ```
 
+## Security
+
+### Sensitive Data
+- **Never commit** `.env`, `.env.local`, or any file with API keys
+- API keys belong in `.env.local` (gitignored)
+- Use `ANTHROPIC_API_KEY` env var, never hardcode
+
+### API Keys Required
+- `ANTHROPIC_API_KEY` - Claude API access (server-side only)
+- Convex keys auto-managed via `npx convex dev`
+
+### Client vs Server
+- API keys must NOT be prefixed with `NEXT_PUBLIC_`
+- Only `NEXT_PUBLIC_CONVEX_URL` is exposed to client
+
 ## Git Workflow
 
 1. Run `pnpm check` before committing
 2. Commits should be atomic with clear messages
 3. Feature branches: `feature/<name>`
 4. Bug fixes: `fix/<name>`
+
+## Evidence Required for PRs
+
+A pull request is reviewable when it includes:
+- All checks pass (`pnpm check`)
+- Build succeeds (`pnpm build`)
+- Diff confined to relevant paths
+- Bug fix → failing test added first, now passes
+- Feature → demonstrates working behavior
+- One-paragraph description covering intent
 
 ## Common Issues
 

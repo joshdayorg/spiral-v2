@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useMutation } from "convex/react";
+import { useState, useMemo } from "react";
+
 import { Doc, Id } from "../../convex/_generated/dataModel";
-import { api } from "../../convex/_generated/api";
 import { 
   X, 
   Plus, 
@@ -27,23 +26,21 @@ const MAX_OPEN_DRAFTS = 3;
 
 export function DraftPanel({ drafts, sessionId, onClose, onHideDraft }: DraftPanelProps) {
   // Track which drafts are "open" in side-by-side view (max 3)
-  const [openDraftIds, setOpenDraftIds] = useState<Id<"drafts">[]>(() => 
-    drafts.slice(0, MAX_OPEN_DRAFTS).map(d => d._id)
-  );
+  const [manualOpenIds, setManualOpenIds] = useState<Id<"drafts">[]>([]);
   const [copiedId, setCopiedId] = useState<Id<"drafts"> | null>(null);
-  
-  const selectDraft = useMutation(api.drafts.select);
 
-  // Update open drafts when drafts list changes
-  useEffect(() => {
-    setOpenDraftIds(prev => {
-      const validIds = prev.filter(id => drafts.some(d => d._id === id));
-      if (validIds.length === 0 && drafts.length > 0) {
-        return drafts.slice(0, MAX_OPEN_DRAFTS).map(d => d._id);
-      }
-      return validIds;
-    });
-  }, [drafts]);
+  // Compute valid open IDs based on current drafts
+  const openDraftIds = useMemo(() => {
+    // Filter to only IDs that still exist in drafts
+    const validManual = manualOpenIds.filter(id => drafts.some(d => d._id === id));
+    
+    // If no manual selection or all manual selections invalid, auto-select first 3
+    if (validManual.length === 0 && drafts.length > 0) {
+      return drafts.slice(0, MAX_OPEN_DRAFTS).map(d => d._id);
+    }
+    
+    return validManual;
+  }, [drafts, manualOpenIds]);
 
   const openDrafts = drafts.filter(d => openDraftIds.includes(d._id));
 
@@ -54,22 +51,28 @@ export function DraftPanel({ drafts, sessionId, onClose, onHideDraft }: DraftPan
   };
 
   const toggleDraftOpen = (draftId: Id<"drafts">) => {
-    setOpenDraftIds(prev => {
-      if (prev.includes(draftId)) {
+    setManualOpenIds(prev => {
+      // Use current openDraftIds for logic since it includes auto-selected ones
+      const currentOpen = prev.length > 0 ? prev : openDraftIds;
+      
+      if (currentOpen.includes(draftId)) {
         // Close it
-        return prev.filter(id => id !== draftId);
-      } else if (prev.length < MAX_OPEN_DRAFTS) {
+        return currentOpen.filter(id => id !== draftId);
+      } else if (currentOpen.length < MAX_OPEN_DRAFTS) {
         // Open it (have room)
-        return [...prev, draftId];
+        return [...currentOpen, draftId];
       } else {
         // Replace oldest with new one
-        return [...prev.slice(1), draftId];
+        return [...currentOpen.slice(1), draftId];
       }
     });
   };
 
   const closeDraft = (draftId: Id<"drafts">) => {
-    setOpenDraftIds(prev => prev.filter(id => id !== draftId));
+    setManualOpenIds(prev => {
+      const currentOpen = prev.length > 0 ? prev : openDraftIds;
+      return currentOpen.filter(id => id !== draftId);
+    });
   };
 
   return (
