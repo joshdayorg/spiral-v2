@@ -58,6 +58,14 @@ pnpm format:check     # Check formatting without writing
 - Orange (#f97316) as accent color
 - Components use `"use client"` directive when needed
 
+### Naming Conventions
+- **Components**: PascalCase (`ChatInterface.tsx`, `DraftPanel.tsx`)
+- **Functions/Variables**: camelCase (`handleNewSession`, `activeSessionId`)
+- **Constants**: UPPER_SNAKE_CASE (`TEMP_USER_ID`, `API_TIMEOUT`)
+- **Files**: kebab-case for utilities (`parse-drafts.ts`, `chat-interface.tsx`)
+- **Types/Interfaces**: PascalCase with descriptive suffixes (`SessionProps`, `DraftData`)
+- **Convex Tables**: camelCase plural (`sessions`, `messages`, `drafts`)
+
 ### State Management
 - Convex for server state (sessions, messages, drafts)
 - React useState for local UI state

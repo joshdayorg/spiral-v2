@@ -11,10 +11,15 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run typecheck && npm run lint && npm run test",
     "check:fix": "npm run typecheck && npm run lint:fix && npm run format",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "changeset publish",
     "prepare": "husky"
   },
   "dependencies": {
@@ -58,6 +63,8 @@
     ]
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.8",
+    "@playwright/test": "^1.57.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/react": "^16.3.1",
     "@types/node": "^20",

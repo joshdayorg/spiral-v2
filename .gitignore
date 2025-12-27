@@ -37,8 +37,10 @@ yarn-error.log*
 # vercel
 .vercel
 
-# factory
-.factory/
+# factory (keep skills but ignore session data)
+.factory/*
+!.factory/skills/
+.factory/skills/*/node_modules/
 
 # typescript
 *.tsbuildinfo
