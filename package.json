@@ -23,7 +23,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^3.0.1",
+    "@ai-sdk/anthropic": "^3.0.2",
     "@ai-sdk/react": "^3.0.3",
     "@auth/core": "0.37.0",
     "@convex-dev/auth": "^0.0.90",
