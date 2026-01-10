@@ -47,7 +47,7 @@
     "nanoid": "^5.1.6",
     "next": "16.1.1",
     "pino": "^10.1.0",
-    "posthog-js": "^1.310.1",
+    "posthog-js": "^1.313.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-markdown": "^10.1.0",
